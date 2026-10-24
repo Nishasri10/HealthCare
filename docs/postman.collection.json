@@ -1,0 +1,72 @@
+{
+  "info": {
+    "name": "Carepoint Healthcare API",
+    "description": "Starter requests for the local Carepoint API. Set baseUrl and token after running the app and signing in.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000/api" },
+    { "key": "token", "value": "" },
+    { "key": "demoPassword", "value": "" },
+    { "key": "doctorId", "value": "1" },
+    { "key": "slotId", "value": "1" },
+    { "key": "appointmentId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Health check",
+      "request": { "method": "GET", "url": "{{baseUrl}}/health" }
+    },
+    {
+      "name": "Patient registration",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"name\":\"Avery Patient\",\"email\":\"avery@example.local\",\"password\":\"local-dev-password-123\"}" },
+        "url": "{{baseUrl}}/auth/register"
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"email\":\"patient.demo@healthcare.local\",\"password\":\"{{demoPassword}}\"}" },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "Current user",
+      "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/auth/me" }
+    },
+    {
+      "name": "Search doctors",
+      "request": { "method": "GET", "url": "{{baseUrl}}/doctors?search=&availableOn=" }
+    },
+    {
+      "name": "Available doctor slots",
+      "request": { "method": "GET", "url": "{{baseUrl}}/doctors/{{doctorId}}/slots" }
+    },
+    {
+      "name": "Book appointment",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"doctorId\":\"{{doctorId}}\",\"slotId\":\"{{slotId}}\",\"reason\":\"Routine consultation\"}" },
+        "url": "{{baseUrl}}/appointments"
+      }
+    },
+    {
+      "name": "My appointments",
+      "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/appointments/my" }
+    },
+    {
+      "name": "Appointment detail",
+      "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/appointments/{{appointmentId}}" }
+    },
+    {
+      "name": "My medical records",
+      "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/records/my" }
+    }
+  ]
+}
