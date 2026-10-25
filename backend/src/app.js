@@ -25,7 +25,7 @@ export function corsAllowedOrigins(
     );
   }
 
-  const origin = configuredOrigin || 'https://health-care-xcqr-eskjbs7sg-nishasri-a.vercel.app/';
+  const origin = configuredOrigin || 'https://health-care-xcqr.vercel.app';
 
   let parsedOrigin;
 
@@ -53,7 +53,7 @@ export function corsAllowedOrigins(
   return [
     parsedOrigin,
     'http://localhost:5173',
-    'https://health-care-xcqr-eskjbs7sg-nishasri-a.vercel.app/',
+    'https://health-care-xcqr.vercel.app',
   ].filter((value, index, origins) => origins.indexOf(value) === index);
 }
 const allowedOrigins = corsAllowedOrigins();
