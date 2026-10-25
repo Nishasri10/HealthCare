@@ -7,11 +7,19 @@ import path from 'node:path';
 import jwt from 'jsonwebtoken';
 import request from 'supertest';
 
-process.env.JWT_SECRET = 'test-only-secret-with-at-least-thirty-two-characters';
-process.env.NODE_ENV = 'test';
-process.env.FRONTEND_ORIGIN = 'http://localhost:5173';
+process.env.JWT_SECRET =
+  'test-only-secret-with-at-least-thirty-two-characters';
+
+process.env.NODE_ENV = 'development';
+
+process.env.FRONTEND_ORIGIN =
+  'https://health-care-p19vb6y59-nishasri-a.vercel.app';
+
 process.env.CLINIC_TIMEZONE = 'Asia/Kolkata';
-process.env.DATA_DIR = await mkdtemp(path.join(tmpdir(), 'healthcare-api-test-'));
+
+process.env.DATA_DIR = await mkdtemp(
+  path.join(tmpdir(), 'healthcare-api-test-')
+);
 const { corsAllowedOrigins, default: app } = await import('../src/app.js');
 const { nextId, readData, updateData } = await import('../src/services/jsonStore.js');
 
@@ -23,14 +31,36 @@ test('health endpoint and security headers respond without an external database'
   assert.deepEqual(response.body, { data: { status: 'ok' } });
   assert.ok(response.headers['x-content-type-options']);
 });
+test('development CORS allows configured frontend and localhost origins but not unrelated origins', async () => {
+  const frontendOrigin =
+    'https://health-care-p19vb6y59-nishasri-a.vercel.app';
 
-test('development CORS allows configured localhost aliases but not unrelated origins', async () => {
-  const localhost = await request(app).get('/api/health').set('Origin', 'http://localhost:5173');
-  assert.equal(localhost.headers['access-control-allow-origin'], 'http://localhost:5173');
-  const loopback = await request(app).get('/api/health').set('Origin', 'http://127.0.0.1:5173');
-  assert.equal(loopback.headers['access-control-allow-origin'], 'http://127.0.0.1:5173');
-  const unrelated = await request(app).get('/api/health').set('Origin', 'http://example.test');
-  assert.equal(unrelated.headers['access-control-allow-origin'], undefined);
+  const frontend = await request(app)
+    .get('/api/health')
+    .set('Origin', frontendOrigin);
+
+  assert.equal(
+    frontend.headers['access-control-allow-origin'],
+    frontendOrigin
+  );
+
+  const loopback = await request(app)
+    .get('/api/health')
+    .set('Origin', 'http://127.0.0.1:5173');
+
+  assert.equal(
+    loopback.headers['access-control-allow-origin'],
+    'http://127.0.0.1:5173'
+  );
+
+  const unrelated = await request(app)
+    .get('/api/health')
+    .set('Origin', 'http://example.test');
+
+  assert.equal(
+    unrelated.headers['access-control-allow-origin'],
+    undefined
+  );
 });
 
 test('production CORS requires and allows only one valid frontend origin', () => {

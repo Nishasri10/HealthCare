@@ -15,22 +15,46 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32 || process.env
 }
 
 const app = express();
-export function corsAllowedOrigins(environment = process.env.NODE_ENV, configuredOrigin = process.env.FRONTEND_ORIGIN) {
+export function corsAllowedOrigins(
+  environment = process.env.NODE_ENV,
+  configuredOrigin = process.env.FRONTEND_ORIGIN
+) {
   if (environment === 'production' && !configuredOrigin) {
-    throw new Error('FRONTEND_ORIGIN must be set to the deployed frontend origin in production.');
+    throw new Error(
+      'FRONTEND_ORIGIN must be set to the deployed frontend origin in production.'
+    );
   }
+
   const origin = configuredOrigin || 'http://localhost:5173';
+
   let parsedOrigin;
+
   try {
     const parsed = new URL(origin);
-    if (!['http:', 'https:'].includes(parsed.protocol) || parsed.origin !== origin) throw new Error();
+
+    if (
+      !['http:', 'https:'].includes(parsed.protocol) ||
+      parsed.origin !== origin
+    ) {
+      throw new Error();
+    }
+
     parsedOrigin = parsed.origin;
   } catch {
-    throw new Error('FRONTEND_ORIGIN must be an origin only, such as https://carepoint.example (without a path or trailing slash).');
+    throw new Error(
+      'FRONTEND_ORIGIN must be an origin only, without a path or trailing slash.'
+    );
   }
-  return environment !== 'production' && parsedOrigin === 'http://localhost:5173'
-    ? [parsedOrigin, 'http://127.0.0.1:5173']
-    : [parsedOrigin];
+
+  if (environment === 'production') {
+    return [parsedOrigin];
+  }
+
+  return [
+    parsedOrigin,
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+  ].filter((value, index, origins) => origins.indexOf(value) === index);
 }
 const allowedOrigins = corsAllowedOrigins();
 app.disable('x-powered-by');

@@ -5,10 +5,13 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import request from 'supertest';
-
 process.env.JWT_SECRET = 'test-only-secret-with-at-least-thirty-two-characters';
 process.env.NODE_ENV = 'test';
-process.env.DATA_DIR = await mkdtemp(path.join(tmpdir(), 'healthcare-flow-test-'));
+process.env.FRONTEND_ORIGIN =
+  'https://health-care-p19vb6y59-nishasri-a.vercel.app';
+process.env.DATA_DIR = await mkdtemp(
+  path.join(tmpdir(), 'healthcare-flow-test-')
+);
 const { default: app } = await import('../src/app.js');
 const { readData, updateData } = await import('../src/services/jsonStore.js');
 
