@@ -1,9 +1,10 @@
+
 import axios from 'axios';
 
 const apiBaseUrl =
   import.meta.env.VITE_API_BASE_URL ||
   import.meta.env.VITE_API_URL ||
-  'https://healthcare-dym8.onrender.com/api';
+  'https://healthcare-appointment-api-dbow.onrender.com/api';
 
 const api = axios.create({
   baseURL: apiBaseUrl,
@@ -11,9 +12,11 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = sessionStorage.getItem('carepoint-token');
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
 
@@ -24,6 +27,7 @@ api.interceptors.response.use(
       error.response?.data?.error?.message ||
       error.message ||
       'Unable to reach the service.';
+
     return Promise.reject(new Error(message));
   }
 );
